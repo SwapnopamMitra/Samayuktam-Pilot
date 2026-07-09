@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMAYUKTAM // PILOT ACCESS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grid-overlay"></div>
+
+<header class="topbar">
+  <div class="topbar-left">SPCMP // CAGM</div>
+  <div class="topbar-right">
+    <span class="dot"></span>PILOT CHANNEL OPEN
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="hero-text">
+      <div class="eyebrow">Samayuktam Licensing</div>
+      <h1>Your binary. <br>Bound to one machine. <br>Verified before it runs.</h1>
+      <p class="hero-sub">
+        DRM3 wraps both CAGM and SPCMP: AES-256-GCM license state, a cryptographic ratchet chain,
+        hardware fingerprint binding, VM and debugger detection. This is not a EULA promise — run the verifier yourself.
+      </p>
+      <div class="hero-actions">
+        <a href="#fingerprint" class="btn-primary">GET PILOT BINARY</a>
+        <a href="#doc-links" class="btn-ghost">READ THE SPEC</a>
+      </div>
+    </div>
+
+    <div class="terminal" id="terminal">
+      <div class="terminal-bar">
+        <span class="tdot r"></span><span class="tdot y"></span><span class="tdot g"></span>
+        <span class="terminal-title" id="terminal-title">./cagm</span>
+        <span class="sim-tag">SIMULATED</span>
+      </div>
+      <div class="terminal-tabs">
+        <button class="term-tab active" data-trace="cagm">CAGM</button>
+        <button class="term-tab" data-trace="spcmp">SPCMP</button>
+      </div>
+      <pre class="terminal-body" id="terminal-body"></pre>
+      <div class="terminal-footnote">
+        This trace is a simulation of real CLI output from our own binaries. Values shown are illustrative, not read from a live run.
+        Request the pilot binary to run it against your own hardware.
+      </div>
+    </div>
+  </section>
+
+  <section class="steps" id="fingerprint">
+    <div class="section-head">
+      <span class="section-index">01</span>
+      <h2>Get bound. Get shipped.</h2>
+    </div>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Get your MAC address</div>
+        <code class="step-code">cat /sys/class/net/eth0/address</code>
+        <p>Your primary NIC's hardware address. First of three inputs the issuer binds your license to.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Get your machine ID</div>
+        <code class="step-code">cat /etc/machine-id</code>
+        <p>Your OS's persistent machine identifier. Second binding input.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Generate your CPU snippet</div>
+        <code class="step-code">awk '/^vendor_id/&amp;&amp;!v{print;v=1} /^cpu family/&amp;&amp;!f{print;f=1} /^model name/&amp;&amp;!m{print;m=1} /^stepping/&amp;&amp;!s{print;s=1}' /proc/cpuinfo &gt; cpu_snippet.txt</code>
+        <p>Pulls vendor ID, CPU family, model name, and stepping into one file. Third binding input.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Mail it all in</div>
+        <code class="step-code">samayuktam.licensing@gmail.com</code>
+        <p>Send the MAC, the machine ID, and the attached <code>cpu_snippet.txt</code>. Nothing else is needed to issue your binary.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-title">Install your witness anchor</div>
+        <code class="step-code">sudo mkdir -p /etc/samayuktam &amp;&amp; sudo chmod 755 /etc/samayuktam
+sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayuktam/.wit-&lt;hash&gt;</code>
+        <p>One-time, root-owned, shipped alongside your binary. Required — the binary will not run without it, by design. After this, every future run is unprivileged.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="spec" id="spec">
+    <div class="section-head">
+      <span class="section-index">02</span>
+      <h2>How your license is enforced</h2>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <div class="spec-label">ENCRYPTION</div>
+        <div class="spec-name">AES-256-GCM</div>
+        <div class="spec-detail">License state encrypted at rest and in memory. Authenticated cipher — tampering breaks the tag, not just the plaintext.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">INTEGRITY</div>
+        <div class="spec-name">Ratchet chain + witness anchors</div>
+        <div class="spec-detail">Each verification step advances the chain. Four independent witness anchors outside the state tree — one root-owned, three user-space — cross-check use count on every run. Any anchor missing or behind is a hard fail, no exceptions.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">BINDING</div>
+        <div class="spec-name">Hardware fingerprint</div>
+        <div class="spec-detail">MAC, machine ID, and CPU identity hashed into one binding key at issuance. Move the binary, it stops running.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">DETECTION</div>
+        <div class="spec-name">VM / debugger scan</div>
+        <div class="spec-detail">Checked before license decrypt on shipped binaries. Not a copy-protection promise — a scoped deterrent against casual extraction.</div>
+      </div>
+      <div class="spec-card spec-card-wide">
+        <div class="spec-label">AVAILABILITY</div>
+        <div class="spec-name">Live server check + TPM counter</div>
+        <div class="spec-detail">Every single run performs a signed round-trip to our licensing server before any work happens — the server's own high-water-mark count is the final word, independent of anything stored on your machine. There is no offline mode and no grace period: if the server is unreachable, the run is refused, by design, not as a fallback. On TPM-equipped machines, a monotonic hardware counter is also provisioned once via <code>tpm_setup_spcmp.sh</code> — a value that survives file deletion, OS reinstalls, and full disk wipes, and resets only via physical <code>TPM2_Clear</code>.</div>
+      </div>
+    </div>
+
+    <div class="doc-subhead">Troubleshooting</div>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-num">T1</div>
+        <div class="step-title">"License commit rejected by server"</div>
+        <code class="step-code">curl -sSf https://drm3-redeem.samayuktam.workers.dev/redeem</code>
+        <p>Confirms the endpoint is reachable from your machine. One Worker serves both CAGM and SPCMP at this single URL — there's no separate per-product endpoint to check. If this hangs or fails, it's your network path (firewall, proxy, offline), not your license — remaining uses stay frozen until a run succeeds end to end.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">T2</div>
+        <div class="step-title">"License integrity violation — prior enrollment detected"</div>
+        <code class="step-code">ls -la /etc/samayuktam</code>
+        <p>Expected the first time you run on a machine that's already enrolled — moving, cloning, or restoring files does not reset this. Do not delete or relocate anchor files yourself; contact us if you believe this is wrong.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">T3</div>
+        <div class="step-title">"No TPM device found" during setup</div>
+        <code class="step-code">ls /dev/tpm0 /dev/tpmrm0</code>
+        <p>Machine has no TPM, or it's disabled in firmware. The app still runs on the server-side check alone — the TPM counter is an additional layer, not a hard requirement, unless your license was specifically issued with hardware binding.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">T4</div>
+        <div class="step-title">TPM counter increment fails</div>
+        <code class="step-code">sudo tpm_setup_spcmp.sh</code>
+        <p>Usually tpm2-tools missing or the NV index owner auth doesn't match. Re-running the setup script as root re-checks and re-provisions the index without disturbing an already-defined counter.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="spec" id="cagm-spec">
+    <div class="section-head">
+      <span class="section-index">03</span>
+      <h2>What CAGM actually does</h2>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <div class="spec-label">ARCHITECTURE</div>
+        <div class="spec-name">Fixed-point residual network</div>
+        <div class="spec-detail">A four-layer fully-connected classifier running entirely in integer arithmetic — no floating point anywhere in the training loop. Residual adds carry L1 and L2 output forward into L2 and L3.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">DETERMINISM</div>
+        <div class="spec-name">Integrity Engine (IE)</div>
+        <div class="spec-detail">Canonicalizes floating-point logits at layer boundaries — NaNs mapped to one bit pattern, negative zero mapped to positive zero — so the same run hashes identically across compilers and hardware.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">PROOF</div>
+        <div class="spec-name">SHA-256 trajectory proof</div>
+        <div class="spec-detail">Weight, gradient, and activation traces are each reduced to a Merkle root; a blockchain-style gradient chain links every epoch to the last. All of it combines into one 64-character hex proof.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">CONTRACT</div>
+        <div class="spec-name">stdout output contract</div>
+        <div class="spec-detail"><code>accuracy</code>, <code>proof</code>, and <code>ie_verify</code> print to stdout in that order. Everything else — epoch progress, warnings — stays on stderr.</div>
+      </div>
+    </div>
+    <div class="spec-footnote">
+      Internal constants — init seeds, quantization steps, hyperparameter bounds — are withheld under the pending patent filing. This is the architecture, not the parameters.
+    </div>
+  </section>
+
+  <section class="spec" id="spcmp-spec">
+    <div class="section-head">
+      <span class="section-index">04</span>
+      <h2>What SPCMP actually does</h2>
+    </div>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <div class="spec-label">ORDERING</div>
+        <div class="spec-name">Canonical float32 ordering</div>
+        <div class="spec-detail">Every IEEE-754 binary32 value is bijectively mapped to a uint32 and ordered by unsigned comparison — one deterministic total order covering NaNs, infinities, signed zero, and subnormals.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">PREPROCESSING</div>
+        <div class="spec-name">Lossy canonicalization</div>
+        <div class="spec-detail">All NaN payloads collapse to one canonical quiet NaN, and −0.0 collapses to +0.0, before ordering. Deliberate and irreversible for those two edge cases — not a bug.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">ENCODING</div>
+        <div class="spec-name">Predictive transform + Zstd</div>
+        <div class="spec-detail">Order-0/1/2 delta prediction runs on the mapped values, then Zstandard compression. A reversible permutation is stored alongside so the original element order can be reconstructed exactly.</div>
+      </div>
+      <div class="spec-card">
+        <div class="spec-label">VERIFICATION</div>
+        <div class="spec-name">Fail-closed, SHA-256 bound</div>
+        <div class="spec-detail">The hash covers the uncompressed predictive stream and is checked before any inverse transform runs. Any mismatch is a hard failure — no partial output, no silent recovery.</div>
+      </div>
+    </div>
+    <div class="spec-footnote">
+      SPCMP is a strict, frozen profile of PCMP v1. Version 1 semantics don't change; anything different needs a new profile identifier.
+    </div>
+  </section>
+
+  <section class="demo" id="demo">
+    <div class="section-head">
+      <span class="section-index">05</span>
+      <h2>Try it before you commit</h2>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-card">
+        <div class="demo-label">HOSTED SIMULATION</div>
+        <div class="demo-name">Extended demo on Hugging Face</div>
+        <p>A broader simulation of the verifier and proof pipeline than what runs in this page's terminal. No install required.</p>
+        <a href="https://huggingface.co/spaces/Swapnopam/Samayuktam-Verify" class="btn-ghost" id="hf-link" target="_blank" rel="noopener">OPEN ON HUGGING FACE</a>
+      </div>
+      <div class="demo-card">
+        <div class="demo-label">PAID PILOT / DEMO</div>
+        <div class="demo-name">Talk to spcmp directly</div>
+        <p>For the real binary, MAC-locked to your hardware, and a walkthrough of the CAGM proof and SPCMP verification chain.</p>
+        <a href="mailto:samayuktam.licensing@gmail.com?subject=Samayuktam%20Pilot%20Request" class="btn-primary">samayuktam.licensing@gmail.com</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="spec" id="pricing">
+    <div class="section-head">
+      <span class="section-index">06</span>
+      <h2>Pilot pricing</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">SPCMP</div>
+        <div class="pricing-price">$2,500</div>
+        <div class="pricing-meta">10 runs &middot; 30 days</div>
+        <div class="pricing-detail">MAC-locked binary. Full canonical-ordering, compression, and fail-closed verification pipeline.</div>
+        <a href="mailto:samayuktam.licensing@gmail.com?subject=SPCMP%20Pilot%20Request" class="btn-ghost pricing-cta">REQUEST SPCMP</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-name">CAGM</div>
+        <div class="pricing-price">$2,000</div>
+        <div class="pricing-meta">10 runs &middot; 30 days</div>
+        <div class="pricing-detail">MAC-locked binary. Fixed-point residual classifier with full IE and trajectory-proof output.</div>
+        <a href="mailto:samayuktam.licensing@gmail.com?subject=CAGM%20Pilot%20Request" class="btn-ghost pricing-cta">REQUEST CAGM</a>
+      </div>
+      <div class="pricing-card pricing-card-highlight">
+        <div class="pricing-label-badge">SAVE $1,000</div>
+        <div class="pricing-name">Bundle</div>
+        <div class="pricing-price">$3,500</div>
+        <div class="pricing-meta">10 runs each &middot; 30 days</div>
+        <div class="pricing-detail">Both binaries, both fingerprint-bound. The full licensing story in one evaluation window.</div>
+        <a href="mailto:samayuktam.licensing@gmail.com?subject=Bundle%20Pilot%20Request" class="btn-primary pricing-cta">REQUEST BUNDLE</a>
+      </div>
+    </div>
+    <div class="spec-footnote">
+      Prices and terms above are visible without contact. No asterisks, no "starting at."
+    </div>
+  </section>
+
+  <section class="spec" id="doc-links">
+    <div class="section-head">
+      <span class="section-index">07</span>
+      <h2>Specifications</h2>
+    </div>
+    <div class="doc-grid">
+      <a href="PDFS/CAGM_Spec.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">SPEC</div>
+        <div class="doc-name">CAGM</div>
+        <div class="doc-detail">Fixed-point residual classifier, Integrity Engine, and trajectory-proof format.</div>
+      </a>
+      <a href="PDFS/PCMP_Spec.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">SPEC</div>
+        <div class="doc-name">PCMP</div>
+        <div class="doc-detail">Base profile: canonical float32 ordering, predictive transform, fail-closed verification.</div>
+      </a>
+      <a href="PDFS/SPCMP_Spec.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">SPEC</div>
+        <div class="doc-name">SPCMP</div>
+        <div class="doc-detail">Frozen PCMP v1 profile as shipped in the pilot binary.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="spec" id="report-links">
+    <div class="section-head">
+      <span class="section-index">08</span>
+      <h2>Test reports</h2>
+    </div>
+
+    <div class="doc-subhead">CAGM</div>
+    <div class="doc-grid">
+      <a href="PDFS/cagm_test_report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">TEST SUITE &middot; 41/41 PASS</div>
+        <div class="doc-name">CAGM Verification Report</div>
+        <div class="doc-detail">Determinism, IE canonicalisation, degenerate inputs, overflow guards — full assertion breakdown.</div>
+      </a>
+      <a href="PDFS/CAGM_Benchmark_Report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">BENCHMARK</div>
+        <div class="doc-name">CAGM vs sklearn</div>
+        <div class="doc-detail">CAGM against 6 sklearn baselines across 5 datasets, stratified k-fold CV, ctypes-native library.</div>
+      </a>
+      <a href="PDFS/report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">CROSS-DEVICE</div>
+        <div class="doc-name">CAGM Cross-Device Benchmark</div>
+        <div class="doc-detail">Accuracy and proof-hash comparison across 4 machines, CPU/GPU/TPU — all proofs identical.</div>
+      </a>
+    </div>
+
+    <div class="doc-subhead">SPCMP / Samayuktam</div>
+    <div class="doc-grid">
+      <a href="PDFS/samayuktam_test_report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">TEST SUITE &middot; 42/42 PASS</div>
+        <div class="doc-name">PCMP / SPCMP Verification Report</div>
+        <div class="doc-detail">Every IEEE-754 edge case and degenerate array shape, checked against an independent Python oracle.</div>
+      </a>
+      <a href="PDFS/SPCMP_Verification_Report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">CROSS-HARDWARE</div>
+        <div class="doc-name">SPCMP Cross-Hardware Verification</div>
+        <div class="doc-detail">Google CPU, TPU, GPU, and a native GPU node — identical Merkle root and hash on all four.</div>
+      </a>
+      <a href="PDFS/samayuktam_cross_machine_report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">CROSS-MACHINE</div>
+        <div class="doc-name">Cross-Machine Determinism</div>
+        <div class="doc-detail">20 sort runs across 4 heterogeneous machines, 5 files each — zero divergent hashes.</div>
+      </a>
+      <a href="PDFS/spcmp_report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">CPU / GPU DETERMINISM</div>
+        <div class="doc-name">SPCMP Determinism Report</div>
+        <div class="doc-detail">Top-k and bottom-k convergence under SPCMP; documents the honest scalar-reduction limit.</div>
+      </a>
+      <a href="PDFS/SPCMP_Aerospace_Proof_Report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">AEROSPACE</div>
+        <div class="doc-name">Aerospace Verification Proof</div>
+        <div class="doc-detail">40/40 assertions: radiation bit-flip absorption, telemetry compression, GNC-loop determinism.</div>
+      </a>
+      <a href="PDFS/samayuktam_scale_report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">SCALE</div>
+        <div class="doc-name">Scale Test Report</div>
+        <div class="doc-detail">32 runs from 100k to 1B float32 elements across 8 data patterns — zero failures.</div>
+      </a>
+      <a href="PDFS/my_report.pdf" class="doc-card" target="_blank" rel="noopener">
+        <div class="doc-label">SORTING BENCHMARK</div>
+        <div class="doc-name">Samayuktam Sorting Benchmark</div>
+        <div class="doc-detail">CPU and GPU sort timing vs NumPy quicksort/mergesort/stable, up to 4.5&times; speedup.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="cta-inner">
+      <h2>The pilot window is open.</h2>
+      <p>Pull your MAC, machine ID, and CPU snippet. Mail them in. Install the witness anchor. Get a binary that only runs on that exact machine.</p>
+      <a href="#fingerprint" class="btn-primary">START THE HANDSHAKE</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>SPCMP v1</span>
+  <span>CAGM v2</span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
