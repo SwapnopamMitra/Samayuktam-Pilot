@@ -278,17 +278,17 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
       <h2>Specifications</h2>
     </div>
     <div class="doc-grid">
-      <a href="PDFS/CAGM_Spec.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/PDF/CAGM_Specification_v2.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">SPEC</div>
         <div class="doc-name">CAGM</div>
         <div class="doc-detail">Fixed-point residual classifier, Integrity Engine, and trajectory-proof format.</div>
       </a>
-      <a href="PDFS/PCMP_Spec.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/PDF/PCMP_v1_Specification.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">SPEC</div>
         <div class="doc-name">PCMP</div>
         <div class="doc-detail">Base profile: canonical float32 ordering, predictive transform, fail-closed verification.</div>
       </a>
-      <a href="PDFS/SPCMP_Spec.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/PDF/SPCMP_v1_Specification.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">SPEC</div>
         <div class="doc-name">SPCMP</div>
         <div class="doc-detail">Frozen PCMP v1 profile as shipped in the pilot binary.</div>
@@ -304,17 +304,17 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
 
     <div class="doc-subhead">CAGM</div>
     <div class="doc-grid">
-      <a href="PDFS/cagm_test_report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/CAGM/cagm_Verification.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">TEST SUITE &middot; 41/41 PASS</div>
         <div class="doc-name">CAGM Verification Report</div>
         <div class="doc-detail">Determinism, IE canonicalisation, degenerate inputs, overflow guards — full assertion breakdown.</div>
       </a>
-      <a href="PDFS/CAGM_Benchmark_Report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/CAGM/CAGM_Sklearn.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">BENCHMARK</div>
         <div class="doc-name">CAGM vs sklearn</div>
         <div class="doc-detail">CAGM against 6 sklearn baselines across 5 datasets, stratified k-fold CV, ctypes-native library.</div>
       </a>
-      <a href="PDFS/report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/CAGM/cagm%20Benchmark_Report.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">CROSS-DEVICE</div>
         <div class="doc-name">CAGM Cross-Device Benchmark</div>
         <div class="doc-detail">Accuracy and proof-hash comparison across 4 machines, CPU/GPU/TPU — all proofs identical.</div>
@@ -323,37 +323,37 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
 
     <div class="doc-subhead">SPCMP / Samayuktam</div>
     <div class="doc-grid">
-      <a href="PDFS/samayuktam_test_report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/SPCMP/PCMP-SPCMP%20Verification%20Report.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">TEST SUITE &middot; 42/42 PASS</div>
         <div class="doc-name">PCMP / SPCMP Verification Report</div>
         <div class="doc-detail">Every IEEE-754 edge case and degenerate array shape, checked against an independent Python oracle.</div>
       </a>
-      <a href="PDFS/SPCMP_Verification_Report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/SPCMP/SPCMP_Cross_Hardware_Verification_Report.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">CROSS-HARDWARE</div>
         <div class="doc-name">SPCMP Cross-Hardware Verification</div>
         <div class="doc-detail">Google CPU, TPU, GPU, and a native GPU node — identical Merkle root and hash on all four.</div>
       </a>
-      <a href="PDFS/samayuktam_cross_machine_report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/SPCMP/Cross-Machine-Determinism.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">CROSS-MACHINE</div>
         <div class="doc-name">Cross-Machine Determinism</div>
         <div class="doc-detail">20 sort runs across 4 heterogeneous machines, 5 files each — zero divergent hashes.</div>
       </a>
-      <a href="PDFS/spcmp_report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/SPCMP/SPCMP%20DETERMINISM%20Report.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">CPU / GPU DETERMINISM</div>
         <div class="doc-name">SPCMP Determinism Report</div>
         <div class="doc-detail">Top-k and bottom-k convergence under SPCMP; documents the honest scalar-reduction limit.</div>
       </a>
-      <a href="PDFS/SPCMP_Aerospace_Proof_Report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/SPCMP/SPCMP_Aerospace_Proof_Report.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">AEROSPACE</div>
         <div class="doc-name">Aerospace Verification Proof</div>
         <div class="doc-detail">40/40 assertions: radiation bit-flip absorption, telemetry compression, GNC-loop determinism.</div>
       </a>
-      <a href="PDFS/samayuktam_scale_report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/SPCMP/samayuktam_scale_report.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">SCALE</div>
         <div class="doc-name">Scale Test Report</div>
         <div class="doc-detail">32 runs from 100k to 1B float32 elements across 8 data patterns — zero failures.</div>
       </a>
-      <a href="PDFS/my_report.pdf" class="doc-card" target="_blank" rel="noopener">
+      <a href="https://github.com/SwapnopamMitra/Samayuktam-Pilot/raw/main/SPCMP/Processing%20benchmark.pdf" class="doc-card" target="_blank" rel="noopener">
         <div class="doc-label">SORTING BENCHMARK</div>
         <div class="doc-name">Samayuktam Sorting Benchmark</div>
         <div class="doc-detail">CPU and GPU sort timing vs NumPy quicksort/mergesort/stable, up to 4.5&times; speedup.</div>
