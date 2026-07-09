@@ -150,6 +150,12 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
         <code class="step-code">sudo tpm_setup_spcmp.sh</code>
         <p>Usually tpm2-tools missing or the NV index owner auth doesn't match. Re-running the setup script as root re-checks and re-provisions the index without disturbing an already-defined counter.</p>
       </div>
+      <div class="step">
+        <div class="step-num">T5</div>
+        <div class="step-title">Cycle mismatch after system restore</div>
+        <code class="step-code">samayuktam.licensing@gmail.com</code>
+        <p>If you've restored from a backup and the binary reports a cycle mismatch, your local state is out of sync with the license server. Email your logs to <code>samayuktam.licensing@gmail.com</code> for a reissue with your remaining uses intact.</p>
+      </div>
     </div>
   </section>
 
@@ -234,6 +240,7 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
         <div class="demo-name">Talk to spcmp directly</div>
         <p>For the real binary, MAC-locked to your hardware, and a walkthrough of the CAGM proof and SPCMP verification chain.</p>
         <a href="mailto:samayuktam.licensing@gmail.com?subject=Samayuktam%20Pilot%20Request" class="btn-primary">samayuktam.licensing@gmail.com</a>
+        <div class="doc-detail" style="margin-top: 10px;">Response within 24 hours.</div>
       </div>
     </div>
   </section>
@@ -269,6 +276,9 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
     </div>
     <div class="spec-footnote">
       Prices and terms above are visible without contact. No asterisks, no "starting at."
+    </div>
+    <div class="spec-footnote">
+      Requires bare metal Linux with a live internet connection. VM environments are not supported — this is a design property of the machine binding, not a limitation.
     </div>
   </section>
 
