@@ -118,9 +118,26 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
         <div class="spec-detail">Checked before license decrypt on shipped binaries. Not a copy-protection promise — a scoped deterrent against casual extraction.</div>
       </div>
       <div class="spec-card spec-card-wide">
-        <div class="spec-label">AVAILABILITY</div>
-        <div class="spec-name">Live server check + TPM counter</div>
-        <div class="spec-detail">Every single run performs a signed round-trip to our licensing server before any work happens — the server's own high-water-mark count is the final word, independent of anything stored on your machine. There is no offline mode and no grace period: if the server is unreachable, the run is refused, by design, not as a fallback. On TPM-equipped machines, a monotonic hardware counter is also provisioned once via <code>tpm_setup_spcmp.sh</code> — a value that survives file deletion, OS reinstalls, and full disk wipes, and resets only via physical <code>TPM2_Clear</code>.</div>
+        <div class="spec-label">AVAILABILITY &middot; DEFAULT PATH</div>
+        <div class="spec-name">Live server check</div>
+        <div class="spec-detail">Every single run performs a signed round-trip to our licensing server before any work happens — the server's own high-water-mark count is the final word, independent of anything stored on your machine. This is the path we build, test, and recommend. There is no offline mode and no grace period: if the server is unreachable, the run is refused, by design, not as a fallback. It also means enforcement isn't sitting on your hardware waiting to be reverse-engineered — the count that matters lives on our infrastructure, not in a file on your disk.</div>
+      </div>
+      <div class="spec-card spec-card-wide">
+        <div class="spec-label">AVAILABILITY &middot; LEGACY, OPTIONAL</div>
+        <div class="spec-name">TPM hardware counter</div>
+        <div class="spec-detail">On TPM-equipped machines, a monotonic hardware counter can also be provisioned via <code>tpm_setup_spcmp.sh</code> — a value that survives file deletion, OS reinstalls, and full disk wipes, resetting only via physical <code>TPM2_Clear</code>. We do not recommend enabling this for pilot or production use. It depends on <code>tpm2-tools</code>, firmware TPM state, and NV-index provisioning that vary by hardware vendor and BIOS revision — failure modes here are materially harder to diagnose remotely than a single rejected HTTPS call. Unless your license was explicitly issued with hardware binding required, treat this as off.</div>
+      </div>
+      <div class="spec-card spec-card-wide">
+        <div class="spec-label">ENVIRONMENTS</div>
+        <div class="spec-name">Verified: WSL2 &amp; Google Colab</div>
+        <div class="spec-detail">Both CAGM and SPCMP have been run and verified end-to-end on WSL2 and on Google Colab — no virtualization workarounds needed to evaluate the pilot. This is narrower than "any VM": snapshot/revert-style VMs (VirtualBox, VMware images you roll back) remain unsupported, since the machine fingerprint assumes stable identity, and reverting a snapshot deliberately breaks that assumption.
+        <br><br>
+        <strong>WSL2 users, one thing to check first:</strong> depending on your Windows build and network mode, WSL2's virtual network adapter can regenerate a new MAC address on restart — which would break your binding through no fault of ours or yours. Before requesting a license, confirm yours doesn't: run <code>cat /sys/class/net/eth0/address</code>, fully restart WSL (<code>wsl --shutdown</code> from PowerShell, then reopen — a same-session re-run won't tell you anything), and compare. Repeat once more after a sleep/wake cycle, since that can trigger the same reset independently of a restart. If the value ever changes, tell us when you request your license so we address it up front instead of after a break.</div>
+      </div>
+      <div class="spec-card spec-card-wide">
+        <div class="spec-label">SYSTEM ACCESS</div>
+        <div class="spec-name">Exactly what touches your machine</div>
+        <div class="spec-detail"><strong>Reads</strong> (once, to compute your binding): your primary NIC's MAC address, <code>/etc/machine-id</code>, and four fields from <code>/proc/cpuinfo</code>. <strong>Writes:</strong> your license state (<code>install3.id</code>, <code>ratchet.log</code>, <code>state3.dat</code>, <code>blob3.dat</code>, <code>mito.log</code>) lives in the same directory as the binary itself — nothing is placed in a hidden home-directory path. Alongside that, four independent witness anchors cross-check use count outside the state files — one root-owned file under <code>/etc/samayuktam/</code>, and three user-space anchors under <code>~/.cache/</code>, <code>~/.config/</code>, and, on WSL, a Windows-side file under your user's <code>AppData\Local\...\INetCache</code> folder. Full paths and a complete removal command are in Troubleshooting, below. <strong>Network:</strong> HTTPS only, to one Cloudflare Worker endpoint (<code>drm3-redeem.samayuktam.workers.dev</code>). Nothing else on the machine is read, written, or modified — no registry, no background service.</div>
       </div>
     </div>
 
@@ -142,19 +159,32 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
         <div class="step-num">T3</div>
         <div class="step-title">"No TPM device found" during setup</div>
         <code class="step-code">ls /dev/tpm0 /dev/tpmrm0</code>
-        <p>Machine has no TPM, or it's disabled in firmware. The app still runs on the server-side check alone — the TPM counter is an additional layer, not a hard requirement, unless your license was specifically issued with hardware binding.</p>
+        <p>Expected on most machines, including WSL2 and Colab. The app runs on the server-side check alone with no loss of enforcement — the TPM counter is a legacy, optional layer we don't recommend enabling, not a hard requirement, unless your license was specifically issued with hardware binding.</p>
       </div>
       <div class="step">
         <div class="step-num">T4</div>
         <div class="step-title">TPM counter increment fails</div>
         <code class="step-code">sudo tpm_setup_spcmp.sh</code>
-        <p>Usually tpm2-tools missing or the NV index owner auth doesn't match. Re-running the setup script as root re-checks and re-provisions the index without disturbing an already-defined counter.</p>
+        <p>Usually tpm2-tools missing or the NV index owner auth doesn't match. Since this path is optional and legacy, our default guidance is to leave it disabled rather than debug it — re-run the setup script as root only if your license was issued requiring hardware binding.</p>
       </div>
       <div class="step">
         <div class="step-num">T5</div>
         <div class="step-title">Cycle mismatch after system restore</div>
         <code class="step-code">samayuktam.licensing@gmail.com</code>
         <p>If you've restored from a backup and the binary reports a cycle mismatch, your local state is out of sync with the license server. Email your logs to <code>samayuktam.licensing@gmail.com</code> for a reissue with your remaining uses intact.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">T6</div>
+        <div class="step-title">Fully removing DRM3 (uninstall)</div>
+        <code class="step-code">rm -f ~/.cache/.smy-*
+rm -f ~/.config/.sy3-*.dat
+rm -f /mnt/c/Users/&lt;you&gt;/AppData/Local/Microsoft/Windows/INetCache/.sy3w-*
+
+sudo rm -rf /etc/samayuktam
+
+# then, from the folder containing your binary:
+rm -f install3.id ratchet.log state3.dat blob3.dat mito.log</code>
+        <p>Everything DRM3 writes lives in exactly these locations: the license state files sitting next to the binary itself, the root-owned anchor, and three user-space witness anchors that independently cross-check use count. Delete all of it and every trace is gone. Delete only some of it and re-run, and you'll get a hard integrity failure — that's the witness system correctly detecting a partial wipe, not a bug.</p>
       </div>
     </div>
   </section>
@@ -278,7 +308,7 @@ sudo cp .wit-&lt;hash&gt; /etc/samayuktam/ &amp;&amp; sudo chmod 644 /etc/samayu
       Prices and terms above are visible without contact. No asterisks, no "starting at."
     </div>
     <div class="spec-footnote">
-      Requires bare metal Linux with a live internet connection. VM environments are not supported — this is a design property of the machine binding, not a limitation.
+      Requires Linux with a live internet connection. WSL2 and Google Colab are verified and supported (see Environments, above). Snapshot/revert-style VMs (VirtualBox, VMware images you roll back) are not — this is a design property of the machine binding, not a limitation.
     </div>
   </section>
 
